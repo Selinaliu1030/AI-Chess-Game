@@ -15,7 +15,7 @@
 Move AB::get_move(State *state, int depth){
   auto actions = state->legal_actions;
   Move ret;
-  int cnt = 0;
+  int cnt = -1e9;
   for(auto nxt: actions)
   {
     int tmp = DFS(state->next_state(nxt), depth, -1e9, 1e9, 0);

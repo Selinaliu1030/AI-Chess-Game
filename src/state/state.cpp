@@ -46,7 +46,7 @@ for(int i=0; i<BOARD_H; i+=1){
         switch (now_piece){
           case 1: //pawn
               ret+=2;
-              if(this->player && i<BOARD_H-1){
+              /*if(this->player && i<BOARD_H-1){
               //black
               if(self_board[i+1][j])
                 ret--;
@@ -55,7 +55,7 @@ for(int i=0; i<BOARD_H; i+=1){
               if(self_board[i-1][j])
                 ret--;
             }
-            break;
+            break;*/
           
           case 2: //rook
           case 4: //bishop
@@ -67,7 +67,7 @@ for(int i=0; i<BOARD_H; i+=1){
               case 5: st=0; end=8; ret+=20; break; //queen
               default: st=0; end=-1;
             }
-            for(int part=st; part<end; part+=1){
+            /*for(int part=st; part<end; part+=1){
               auto move_list = move_table_rook_bishop[part];
               for(int k=0; k<std::max(BOARD_H, BOARD_W); k+=1){
                 int p[2] = {move_list[k][0] + i, move_list[k][1] + j};
@@ -76,28 +76,28 @@ for(int i=0; i<BOARD_H; i+=1){
                   ret--;
                 }
               }
-            break;
+            break;*/
           
           case 3: //knight
             ret+=7;
-            for(auto move: move_table_knight){
+            /*for(auto move: move_table_knight){
               int x = move[0] + i;
               int y = move[1] + j;
               
              if(x < BOARD_H && x >=0 && y <BOARD_W && y >=0 && self_board[x][y]) 
                   ret--;
             }
-            break;
+            break;*/
           
           case 6: //king
           ret+=1000;
-            for(auto move: move_table_king){
+           /* for(auto move: move_table_king){
               int p[2] = {move[0] + i, move[1] + j};
               
               if(p[0]< BOARD_H && p[0]>=0 && p[1]<BOARD_W && p[1]>=0 && self_board[p[0]][p[1]]) 
                   ret--;
             }
-            break;
+            break;*/
         }
       }
     }

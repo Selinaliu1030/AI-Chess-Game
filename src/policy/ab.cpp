@@ -13,37 +13,58 @@
  */
 
 Move AB::get_move(State *state, int depth){
-  DFS(state, depth, -1e9, 1e9);
-  //state->legal_actions.push_back(state->best_nxt_move);
-  return state->best_nxt_move;
-}
-int AB::DFS(State* cur, int depth, int alpha, int beta)
-{
-  if(depth == 0)
-    return cur->evaluate();
-
-  auto actions = cur->legal_actions;
-  cur->alpha = alpha;
-  cur->beta = beta;
+  auto actions = state->legal_actions;
+  Move ret;
+  int cnt = 0;
   for(auto nxt: actions)
   {
-    int cnt = DFS(cur->next_state(nxt), depth-1, cur->alpha, cur->beta);
-    if(!cur->player && cnt > cur->alpha)//me
+    int tmp = DFS(state->next_state(nxt), depth, -1e9, 1e9, 0);
+    if(tmp > cnt)
     {
-      cur->alpha = cnt;
-      cur->best_nxt_move = nxt;
-      if(cur->alpha > cur->beta)
-        return cnt;
-    }
-    if(cur->player && cnt < cur->beta)//opp
-    {
-      cur->beta = cnt;
-      cur->best_nxt_move = nxt;
-      if(cur->alpha > cur->beta)
-        return cnt;
+      cnt = tmp;
+      ret = nxt;
     }
   }
-  if(!cur->player)//me
-    return cur->alpha;
-  return cur->beta;
+  return ret;
+}
+int AB::DFS(State* cur, int depth, int alpha, int beta, bool max_player)
+{
+  if(!cur->legal_actions.size())
+    return cur->evaluate();
+  auto actions = cur->legal_actions;
+  if(depth == 0)
+    return cur->evaluate();
+  int value;
+  if(max_player)
+  {
+    value = -1e9;
+    for(auto nxt: actions)
+    {
+      int tmp = DFS(cur->next_state(nxt), depth-1, alpha, beta, 0);
+      if(tmp > value)
+        value = tmp;
+      if(alpha > value)
+        value = alpha;
+      if(alpha >= beta)
+        break;
+    }
+    cur->value = value;
+    return value;
+  }
+  else
+  {
+    value = 1e9;
+    for(auto nxt: actions)
+    {
+      int tmp = DFS(cur->next_state(nxt), depth-1, alpha, beta, 1);
+      if(tmp < value)
+        value = tmp;
+      if(beta < value)
+        value = beta;
+      if(alpha >= beta)
+        break;
+    }
+    cur->value = value;
+    return value;
+  }
 }

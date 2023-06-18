@@ -9,5 +9,5 @@
 class AB{
 public:
   static Move get_move(State *state, int depth);
-  static int DFS(State* cur, int depth, int alpha, int beta);
+  static int DFS(State* cur, int depth, int alpha, int beta, bool max_player);
 };

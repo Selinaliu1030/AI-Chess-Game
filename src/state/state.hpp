@@ -47,6 +47,8 @@ class State{
     Board board;
     int player = 0;
     std::vector<Move> legal_actions;
+    Move best_nxt_move;
+    int alpha, beta;
     
     State(){};
     State(int player): player(player){};

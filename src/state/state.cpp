@@ -11,9 +11,98 @@
  * 
  * @return int 
  */
-int State::evaluate(){
+
+ static const int move_table_rook_bishop[8][7][2] = {
+  {{0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}},
+  {{0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7}},
+  {{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}},
+  {{-1, 0}, {-2, 0}, {-3, 0}, {-4, 0}, {-5, 0}, {-6, 0}, {-7, 0}},
+  {{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}},
+  {{1, -1}, {2, -2}, {3, -3}, {4, -4}, {5, -5}, {6, -6}, {7, -7}},
+  {{-1, 1}, {-2, 2}, {-3, 3}, {-4, 4}, {-5, 5}, {-6, 6}, {-7, 7}},
+  {{-1, -1}, {-2, -2}, {-3, -3}, {-4, -4}, {-5, -5}, {-6, -6}, {-7, -7}},
+};
+static const int move_table_knight[8][2] = {
+  {1, 2}, {1, -2},
+  {-1, 2}, {-1, -2},
+  {2, 1}, {2, -1},
+  {-2, 1}, {-2, -1},
+};
+static const int move_table_king[8][2] = {
+  {1, 0}, {0, 1}, {-1, 0}, {0, -1}, 
+  {1, 1}, {1, -1}, {-1, 1}, {-1, -1},
+};
+
+int State::evaluate()
+  {
   // [TODO] design your own evaluation function
-  return 0;
+  int ret = 0;
+  auto self_board = this->board.board[this->player];
+  int now_piece;
+for(int i=0; i<BOARD_H; i+=1){
+    for(int j=0; j<BOARD_W; j+=1){
+      if((now_piece=self_board[i][j])){
+        // std::cout << this->player << "," << now_piece << ' ';
+        switch (now_piece){
+          case 1: //pawn
+              ret+=2;
+              if(this->player && i<BOARD_H-1){
+              //black
+              if(self_board[i+1][j])
+                ret--;
+            }else if(!this->player && i>0){
+              //white
+              if(self_board[i-1][j])
+                ret--;
+            }
+            break;
+          
+          case 2: //rook
+          case 4: //bishop
+          case 5: //queen
+            int st, end;
+            switch (now_piece){
+              case 2: st=0; end=4; ret+=6; break; //rook
+              case 4: st=4; end=8; ret+=8; break; //bishop
+              case 5: st=0; end=8; ret+=20; break; //queen
+              default: st=0; end=-1;
+            }
+            for(int part=st; part<end; part+=1){
+              auto move_list = move_table_rook_bishop[part];
+              for(int k=0; k<std::max(BOARD_H, BOARD_W); k+=1){
+                int p[2] = {move_list[k][0] + i, move_list[k][1] + j};
+                
+                if(p[0]< BOARD_H && p[0]>=0 && p[1]<BOARD_W && p[1]>=0 && self_board[p[0]][p[1]]) 
+                  ret--;
+                }
+              }
+            break;
+          
+          case 3: //knight
+            ret+=7;
+            for(auto move: move_table_knight){
+              int x = move[0] + i;
+              int y = move[1] + j;
+              
+             if(x < BOARD_H && x >=0 && y <BOARD_W && y >=0 && self_board[x][y]) 
+                  ret--;
+            }
+            break;
+          
+          case 6: //king
+          ret+=1000;
+            for(auto move: move_table_king){
+              int p[2] = {move[0] + i, move[1] + j};
+              
+              if(p[0]< BOARD_H && p[0]>=0 && p[1]<BOARD_W && p[1]>=0 && self_board[p[0]][p[1]]) 
+                  ret--;
+            }
+            break;
+        }
+      }
+    }
+  }
+  return ret;
 }
 
 
@@ -47,28 +136,6 @@ State* State::next_state(Move move){
 }
 
 
-static const int move_table_rook_bishop[8][7][2] = {
-  {{0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6}, {0, 7}},
-  {{0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7}},
-  {{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}},
-  {{-1, 0}, {-2, 0}, {-3, 0}, {-4, 0}, {-5, 0}, {-6, 0}, {-7, 0}},
-  {{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}, {6, 6}, {7, 7}},
-  {{1, -1}, {2, -2}, {3, -3}, {4, -4}, {5, -5}, {6, -6}, {7, -7}},
-  {{-1, 1}, {-2, 2}, {-3, 3}, {-4, 4}, {-5, 5}, {-6, 6}, {-7, 7}},
-  {{-1, -1}, {-2, -2}, {-3, -3}, {-4, -4}, {-5, -5}, {-6, -6}, {-7, -7}},
-};
-static const int move_table_knight[8][2] = {
-  {1, 2}, {1, -2},
-  {-1, 2}, {-1, -2},
-  {2, 1}, {2, -1},
-  {-2, 1}, {-2, -1},
-};
-static const int move_table_king[8][2] = {
-  {1, 0}, {0, 1}, {-1, 0}, {0, -1}, 
-  {1, 1}, {1, -1}, {-1, 1}, {-1, -1},
-};
-
-
 /**
  * @brief get all legal actions of now state
  * 
@@ -85,7 +152,8 @@ void State::get_legal_actions(){
   int now_piece, oppn_piece;
   for(int i=0; i<BOARD_H; i+=1){
     for(int j=0; j<BOARD_W; j+=1){
-      if((now_piece=self_board[i][j])){
+      now_piece=self_board[i][j];
+      if((now_piece)){
         // std::cout << this->player << "," << now_piece << ' ';
         switch (now_piece){
           case 1: //pawn
@@ -212,10 +280,10 @@ void State::get_legal_actions(){
 }
 
 
-const char piece_table[2][7][5] = {
+/*const char piece_table[2][7][5] = {
   {" ", "♙", "♖", "♘", "♗", "♕", "♔"},
   {" ", "♟", "♜", "♞", "♝", "♛", "♚"}
-};
+};*/
 /**
  * @brief encode the output for command line output
  * 

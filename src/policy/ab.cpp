@@ -43,8 +43,8 @@ int AB::DFS(State* cur, int depth, int alpha, int beta, bool max_player)
       int tmp = DFS(cur->next_state(nxt), depth-1, alpha, beta, 0);
       if(tmp > value)
         value = tmp;
-      if(alpha > value)
-        value = alpha;
+      if(value > alpha)
+        alpha = value;
       if(alpha >= beta)
         break;
     }
@@ -59,8 +59,8 @@ int AB::DFS(State* cur, int depth, int alpha, int beta, bool max_player)
       int tmp = DFS(cur->next_state(nxt), depth-1, alpha, beta, 1);
       if(tmp < value)
         value = tmp;
-      if(beta < value)
-        value = beta;
+      if(value < beta)
+        beta = value;
       if(alpha >= beta)
         break;
     }

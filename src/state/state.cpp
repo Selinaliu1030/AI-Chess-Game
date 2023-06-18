@@ -36,74 +36,97 @@ static const int move_table_king[8][2] = {
 int State::evaluate()
   {
   // [TODO] design your own evaluation function
-  int ret = 0;
+std::vector<Move> all_actions;
   auto self_board = this->board.board[this->player];
-  int now_piece;
-for(int i=0; i<BOARD_H; i+=1){
+  auto oppn_board = this->board.board[1 - this->player];
+  
+  int now_piece, oppn_piece, ret = 0;
+  for(int i=0; i<BOARD_H; i+=1){
     for(int j=0; j<BOARD_W; j+=1){
-      if((now_piece=self_board[i][j])){
+      now_piece=self_board[i][j];
+      if((now_piece)){
         // std::cout << this->player << "," << now_piece << ' ';
         switch (now_piece){
           case 1: //pawn
-              ret+=2;
-              /*if(this->player && i<BOARD_H-1){
+          ret+=2;
+            if(this->player && i<BOARD_H-1){
               //black
-              if(self_board[i+1][j])
-                ret--;
+              if(!oppn_board[i+1][j] && !self_board[i+1][j])
+                ret++;
+              if(j<BOARD_W-1 && (oppn_piece=oppn_board[i+1][j+1])>0)
+                ret++;
+
+              if(j>0 && (oppn_piece=oppn_board[i+1][j-1])>0)
+                ret++;
+              
             }else if(!this->player && i>0){
               //white
-              if(self_board[i-1][j])
-                ret--;
+              if(!oppn_board[i-1][j] && !self_board[i-1][j])
+                ret++;
+              if(j<BOARD_W-1 && (oppn_piece=oppn_board[i-1][j+1])>0){
+                ret++;
+              }
+              if(j>0 && (oppn_piece=oppn_board[i-1][j-1])>0){
+                ret++;
+              }
             }
-            break;*/
+            break;
           
           case 2: //rook
           case 4: //bishop
           case 5: //queen
             int st, end;
             switch (now_piece){
-              case 2: st=0; end=4; ret+=6; break; //rook
-              case 4: st=4; end=8; ret+=8; break; //bishop
-              case 5: st=0; end=8; ret+=20; break; //queen
+              case 2: st=0; end=4; ret += 6; break; //rook
+              case 4: st=4; end=8; ret += 8; break; //bishop
+              case 5: st=0; end=8; ret += 20; break; //queen
               default: st=0; end=-1;
             }
-            /*for(int part=st; part<end; part+=1){
+            for(int part=st; part<end; part+=1){
               auto move_list = move_table_rook_bishop[part];
               for(int k=0; k<std::max(BOARD_H, BOARD_W); k+=1){
                 int p[2] = {move_list[k][0] + i, move_list[k][1] + j};
                 
-                if(p[0]< BOARD_H && p[0]>=0 && p[1]<BOARD_W && p[1]>=0 && self_board[p[0]][p[1]]) 
-                  ret--;
-                }
+                if(p[0]>=BOARD_H || p[0]<0 || p[1]>=BOARD_W || p[1]<0) break;
+                now_piece = self_board[p[0]][p[1]];
+                if(now_piece) break;
+                ret++;
               }
-            break;*/
+            }
+            break;
           
           case 3: //knight
-            ret+=7;
-            /*for(auto move: move_table_knight){
+          ret+=7;
+            for(auto move: move_table_knight){
               int x = move[0] + i;
               int y = move[1] + j;
               
-             if(x < BOARD_H && x >=0 && y <BOARD_W && y >=0 && self_board[x][y]) 
-                  ret--;
+              if(x>=BOARD_H || x<0 || y>=BOARD_W || y<0) continue;
+              now_piece = self_board[x][y];
+              if(now_piece) continue;
+              ret++;
+              
             }
-            break;*/
+            break;
           
           case 6: //king
-          ret+=1000;
-           /* for(auto move: move_table_king){
+            ret+=1000;
+            for(auto move: move_table_king){
               int p[2] = {move[0] + i, move[1] + j};
               
-              if(p[0]< BOARD_H && p[0]>=0 && p[1]<BOARD_W && p[1]>=0 && self_board[p[0]][p[1]]) 
-                  ret--;
+              if(p[0]>=BOARD_H || p[0]<0 || p[1]>=BOARD_W || p[1]<0) continue;
+              now_piece = self_board[p[0]][p[1]];
+              if(now_piece) continue;
+              
+              ret++;
             }
-            break;*/
+            break;
         }
       }
     }
   }
-  return ret;
 }
+
 
 
 /**

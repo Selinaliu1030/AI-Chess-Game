@@ -14,7 +14,7 @@
 
 Move Minmax::get_move(State *state, int depth){
   DFS(state, depth);
-  state->legal_actions.push_back(state->best_nxt_move);
+  //state->legal_actions.push_back(state->best_nxt_move);
   return state->best_nxt_move;
 }
 int Minmax::DFS(State* cur, int depth)
@@ -22,7 +22,7 @@ int Minmax::DFS(State* cur, int depth)
   if(depth == 0)
     return cur->evaluate();
   auto actions = cur->legal_actions;
-  int best_state_max = 0, best_state_min = 1e9;
+  int best_state_max = -1e9, best_state_min = 1e9;
   for(auto nxt: actions)
   {
     int cnt = DFS(cur->next_state(nxt), depth-1);

@@ -125,6 +125,7 @@ std::vector<Move> all_actions;
       }
     }
   }
+  return ret;
 }
 
 
